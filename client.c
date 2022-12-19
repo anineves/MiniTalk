@@ -22,16 +22,16 @@ void	send_msg(int pid, char *msg, size_t len_msg)
 
 int	main(int argc, char **argv)
 {
-	int		pid;
+	int		pid_server;
 	char	*msg;
-  size_t len_msg;
+	size_t len_msg;
 
 
 	if (argc == 3)
 	{
-		pid = ft_atoi(argv[1]);
+		pid_server = ft_atoi(argv[1]);
 		msg = argv[2];
-    len_msg = ft_strlen(msg)
+		len_msg = ft_strlen(msg);
 		send_msg(pid, msg, len_msg);
 	}
 }
