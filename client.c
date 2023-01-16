@@ -1,4 +1,17 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   client.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: asousa-n <asousa-n@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/12/21 09:44:34 by asousa-n          #+#    #+#             */
+/*   Updated: 2022/12/21 09:45:09 by asousa-n         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minitalk.h"
+#include <stdio.h>
 
 void	send_msg(pid_t p, char *str)
 {
@@ -19,21 +32,20 @@ void	send_msg(pid_t p, char *str)
 				kill(p, SIGUSR2);
 			c >>= 1;
 			bit--;
-			usleep(30);
+			usleep(100);
 		}
 		count++;
 	}
 }
 
-
 int	main(int argc, char **argv)
 {
 	pid_t		pid_server;
-	char	*msg;
+	char		*msg;
 
-	if(argc != 3)
+	if (argc != 3)
 	{
-		printf("Numero de argumentos invalido \n Por favor insira o pid do cliente e a mensagem");
+		ft_printf("invalid arguments");
 		return (0);
 	}
 	pid_server = ft_atoi(argv[1]);
