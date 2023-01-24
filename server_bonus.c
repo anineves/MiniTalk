@@ -15,47 +15,48 @@
 void	handler_signals(int signal, siginfo_t *info, void *ucontent)
 {
 	static int				i = 0;
+	static pid_t			client_pid = 0;
 	static unsigned char	c = 0;
-	
+
 	(void)ucontent;
-	if (i < 0)
-		i = 7;
-	if (signal == SIGUSR1)
-		c =  c | (1 << i);
-	i++;
-	if (i == 8)
+	if (!client_pid)
+		client_pid = info->si_pid;
+	c |= (signal == SIGUSR2);
+	if (++i == 8)
 	{
-		if (c == '\0')
-		{
-			ft_printf(");
-			kill (info->si_pid, SIGUSR1);
-		}
 		i = 0;
-		c = 0; 
+		if (!c)
+		{
+			kill(client_pid, SIGUSR2);
+			client_pid = 0;
+			return ;
+		}
+		ft_putchar_fd(c, 1);
+		c = 0;
+		kill(client_pid, SIGUSR1);
 	}
-	
+	else
+		c <<= 1;
 }
 
 void	config_signals(void)
 {
-	struct sigaction	sa_sigact;
+	struct sigaction	sigact;
 
-	sa_sigact.sa_sigaction = &handler_signals;
-	sa_sigact.sa_flags = SA_SIGINFO;
-	if (sigaction(SIGUSR1, &sa_sigact, NULL) == -1)
-		printf("Error SIGUSR1");
-	if (sigaction(SIGUSR2, &sa_sigact, NULL) == -1)
-		printf("Error SIGUR2");
+	sigact.sa_sigaction = &handler_signals;
+	sigact.sa_flags = SA_SIGINFO;
+	sigaction(SIGUSR1, &sigact, 0);
+	sigaction(SIGUSR2, &sigact, 0);
 }
 
 int	main(void)
 {
 	pid_t	pid;
-	
+
 	pid = getpid();
 	ft_printf("PID = %d\n", pid);
 	config_signals();
 	while (1)
-		config_signals();
+		pause();
 	return (0);
 }
