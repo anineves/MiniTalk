@@ -11,66 +11,69 @@
 /* ************************************************************************** */
 
 #include "minitalk.h"
-#include <stdio.h>
-
-void	send_msg(char *str, pid_t p)
+void	send_msg(pid_t pid, char *msg)
 {
-	int				count;
-	unsigned char	c;
-	int				bit;
-	int				lenstr;
+	int		i;
+	char	c;
 
-	count = 0;
-	lenstr = ft_strlen(str);
-	while (count <= lenstr)
+	while (*msg)
 	{
-		c = (unsigned char) str[count];
-		bit = 0;
-		while (bit < 8)
+		i = 8;
+		c = *msg++;
+		while (i--)
 		{
-			if (c & 0b00000001)
-				kill(p, SIGUSR1);
+			if (c >> i & 1)
+				kill(pid, SIGUSR2);
 			else
-				kill(p, SIGUSR2);
-			c >>= 1;
-			bit++;
-			usleep(30);
+				kill(pid, SIGUSR1);
+			usleep(300);
 		}
-		count++;
+	}
+	i = 8;
+	while (i--)
+	{
+		kill(pid, SIGUSR1);
+		usleep(300);
 	}
 }
 
 void	handler(int signal)
 {
+	static int	received = 0;
+
 	if (signal == SIGUSR1)
-		ft_printf("Message received!");
+		++received;
+	else
+	{
+		ft_printf("Mensagem de %d, caracteres recebida", received);
+		ft_putchar_fd('\n', 1);
+		exit(0);
+	}
 }
 
 void	config_signals(void)
 {
-	struct sigaction	sa_sigact;
+	struct sigaction	sigact;
 
-	sa_sigact.sa_handler = &handler;
-	sa_sigact.sa_flags = SA_SIGINFO;
-	if (sigaction(SIGUSR1, &sa_sigact, NULL) == -1)
-		printf("Error SIGUSR1");
-	if (sigaction(SIGUSR2, &sa_sigact, NULL) == -1)
-		printf("Error SIGUR2");
+	sigact.sa_flags = SA_SIGINFO;
+	signal(SIGUSR1, handler);
+	signal(SIGUSR2, handler);
 }
 
 int	main(int argc, char **argv)
 {
-	pid_t		pid_server;
-	char	*msg;
+	pid_t		pid;
+	char		*msg;
 
-	if(argc != 3)
+	if (argc != 3)
 	{
-		printf("Numero de argumentos invalido \n Por favor insira o pid do cliente e a mensagem");
-		return (0);
+		ft_printf("invalid arguments");
+		return (1);
 	}
-	pid_server = ft_atoi(argv[1]);
+	pid = ft_atoi(argv[1]);
 	msg = argv[2];
-	send_msg(pid_server, msg);
+	config_signals();
+	send_msg(pid, msg);
 	while (1)
 		pause();
 	return (0);
