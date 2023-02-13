@@ -11,53 +11,39 @@
 # **************************************************************************** #
 
 NAME = minitalk.a
-CC = cc
-CFLAG = -Wall -Wextra -Werror
-LIBFT = ./libft/libft.a
-RM = rm -rf
 
-SERVER = server
+CC = cc
+
+CFLAGS = -Wall -Werror -Wextra
+
+LIBFT = ./libft/libft.a
+
 CLIENT = client
 
-SERVER_SRCS = server.c
-SERVER_OBJS = $(SERVER_SRCS:.c=.o)
+SERVER = server
 
-CLIENT_SRCS = client.c
-CLIENT_OBJS = $(CLIENT_SRCS:.c=.o)
+all: $(CLIENT) $(SERVER)
 
-SERVER_BONUS = server_bonus
-CLIENT_BONUS = client_bonus
-
-SERVER_BONUS_SRCS = server_bonus.c
-SERVER_BONUS_OBJS = $(SERVER_BONUS_SRCS:.c=.o)
-
-CLIENT_BONUS_SRCS = client_bonus.c
-CLIENT_BONUS_OBJS = $(CLIENT_BONUS_SRCS:.c=.o)
-
-
-all: $(SERVER) $(CLIENT)
-
-$(LIBFT):
+$(SERVER):
 	$(MAKE) -C ./libft
-$(SERVER): $(SERVER_OBJS) $(LIBFT)
-	$(CC) $(CFLAGS) $(SERVER_OBJS) $(LIBFT) -o server
-$(CLIENT): $(CLIENT_OBJS) $(LIBFT)
-	$(CC) $(CFLAGS) $(CLIENT_OBJS) $(LIBFT) -o client
-
-$(SERVER_BONUS): $(SERVER_BONUS_OBJS) $(LIBFT)
-	$(CC) $(CFLAGS) $(SERVER_BONUS_OBJS) $(LIBFT) -o server_bonus
-$(CLIENT_BONUS): $(CLIENT_BONUS_OBJS) $(LIBFT)
-	$(CC) $(CFLAGS) $(CLIENT_BONUS_OBJS) $(LIBFT) -o client_bonus
-
+	$(CC) $(CFLAGS) server.c $(LIBFT) -o server
 	
+$(CLIENT):
+	$(MAKE) -C ./libft
+	$(CC) $(CFLAGS) client.c $(LIBFT) -o client
+
+
 clean:
 	$(MAKE) clean -C ./libft
-	$(RM) $(SERVER_OBJS) $(CLIENT_OBJS)
-	$(RM) $(SERVER_BONUS_OBJS) $(CLIENT_BONUS_OBJS) 
+	rm -rf client server client_bonus server_bonus
+
 fclean: clean
 	$(MAKE) fclean -C ./libft
-	$(RM) $(SERVER) $(CLIENT)
-	$(RM) $(SERVER_BONUS) $(CLIENT_BONUS)
+
 re: fclean all
 
-bonus: $(SERVER_BONUS) $(CLIENT_BONUS)
+bonus:
+	$(MAKE) -C ./libft
+	$(CC) $(CFLAGS) client_bonus.c $(LIBFT) -o client_bonus
+	$(CC) $(CFLAGS) server_bonus.c $(LIBFT) -o server_bonus
+	
