@@ -11,36 +11,33 @@
 /* ************************************************************************** */
 
 #include "minitalk.h"
-#include <stdio.h>
 
-void	send_msg(pid_t p, char *str)
+void	send_msg(pid_t pid, char *msg)
 {
-	int				count;
 	unsigned char	c;
 	int				bit;
 
-	count = 0;
-	while (str[count] != '\0')
+	while (*msg)
 	{
-		c = (unsigned char) str[count];
+		c = *msg;
 		bit = 8;
 		while (bit > 0)
 		{
 			if (c & 0b00000001)
-				kill(p, SIGUSR1);
+				kill(pid, SIGUSR1);
 			else
-				kill(p, SIGUSR2);
-			c >>= 1;
+				kill(pid, SIGUSR2);
+			c = c >> 1;
 			bit--;
-			usleep(100);
+			usleep(300);
 		}
-		count++;
+		msg++;
 	}
 }
 
 int	main(int argc, char **argv)
 {
-	pid_t		pid_server;
+	pid_t		pid;
 	char		*msg;
 
 	if (argc != 3)
@@ -48,8 +45,8 @@ int	main(int argc, char **argv)
 		ft_printf("invalid arguments");
 		return (0);
 	}
-	pid_server = ft_atoi(argv[1]);
+	pid = ft_atoi(argv[1]);
 	msg = argv[2];
-	send_msg(pid_server, msg);
+	send_msg(pid, msg);
 	return (0);
 }
