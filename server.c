@@ -11,12 +11,11 @@
 /* ************************************************************************** */
 
 #include "minitalk.h"
-#include <stdio.h>
 
 void	handler_signals(int signal)
 {
-	static int				i = 0;
-	static unsigned char	c = 0;
+	static int	i = 0;
+	static char	c = 0;
 
 	if (signal == SIGUSR1)
 		c |= (1 << i);
@@ -31,14 +30,14 @@ void	handler_signals(int signal)
 
 void	config_signals(void)
 {
-	struct sigaction	sa_sigact;
+	struct sigaction	sigact;
 
-	sa_sigact.sa_handler = &handler_signals;
-	sa_sigact.sa_flags = SA_SIGINFO;
-	if (sigaction(SIGUSR1, &sa_sigact, NULL) == -1)
+	sigact.sa_handler = &handler_signals;
+	sigact.sa_flags = SA_SIGINFO;
+	if (sigaction(SIGUSR1, &sigact, NULL) == -1)
 		ft_printf("Error SIGUSR1");
-	if (sigaction(SIGUSR2, &sa_sigact, NULL) == -1)
-		ft_printf("Error SIGUR2");
+	if (sigaction(SIGUSR2, &sigact, NULL) == -1)
+		ft_printf("Error SIGUSR2");
 }
 
 int	main(void)
@@ -46,7 +45,7 @@ int	main(void)
 	pid_t	pid;
 
 	pid = getpid();
-	printf("PID = %d\n", pid);
+	ft_printf("PID = %d\n", pid);
 	config_signals();
 	while (1)
 		pause();
