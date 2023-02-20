@@ -21,22 +21,24 @@ void	handler_signals(int signal, siginfo_t *info, void *ucontent)
 	(void)ucontent;
 	if (!client_pid)
 		client_pid = info->si_pid;
-	c |= (signal == SIGUSR2);
-	if (++i == 8)
+	if (signal == SIGUSR1)
+		c |= 1;
+	i++;
+	if (i == 8)
 	{
 		i = 0;
 		if (!c)
 		{
-			kill(client_pid, SIGUSR2);
+			kill(client_pid, SIGUSR1);
 			client_pid = 0;
 			return ;
 		}
 		ft_putchar_fd(c, 1);
 		c = 0;
-		kill(client_pid, SIGUSR1);
+		kill(client_pid, SIGUSR2);
 	}
 	else
-		c <<= 1;
+		c = c << 1;
 }
 
 void	config_signals(void)
@@ -47,6 +49,10 @@ void	config_signals(void)
 	sigact.sa_flags = SA_SIGINFO;
 	sigaction(SIGUSR1, &sigact, 0);
 	sigaction(SIGUSR2, &sigact, 0);
+	if (sigaction(SIGUSR1, &sigact, NULL) == -1)
+		ft_printf("Error SIGUSR1");
+	if (sigaction(SIGUSR2, &sigact, NULL) == -1)
+		ft_printf("Error SIGUSR2");
 }
 
 int	main(void)
