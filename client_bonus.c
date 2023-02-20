@@ -11,37 +11,40 @@
 /* ************************************************************************** */
 
 #include "minitalk.h"
+#include <stdio.h>
+
 void	send_msg(pid_t pid, char *msg)
 {
-	int		i;
-	char	c;
+	unsigned char	c;
+	int				i;
 
 	while (*msg)
 	{
 		i = 8;
-		c = *msg++;
+		c = *msg;
 		while (i--)
 		{
 			if (c >> i & 1)
-				kill(pid, SIGUSR2);
-			else
 				kill(pid, SIGUSR1);
+			else
+				kill(pid, SIGUSR2);
 			usleep(300);
 		}
+		msg++;
 	}
 	i = 8;
 	while (i--)
 	{
-		kill(pid, SIGUSR1);
+		kill(pid, SIGUSR2);
 		usleep(300);
 	}
 }
 
-void	handler(int signal)
+void	handler_signals(int signal)
 {
 	static int	received = 0;
 
-	if (signal == SIGUSR1)
+	if (signal == SIGUSR2)
 		++received;
 	else
 	{
@@ -55,9 +58,10 @@ void	config_signals(void)
 {
 	struct sigaction	sigact;
 
+	sigact.sa_handler = &handler_signals;
 	sigact.sa_flags = SA_SIGINFO;
-	signal(SIGUSR1, handler);
-	signal(SIGUSR2, handler);
+	sigaction(SIGUSR1, &sigact, 0);
+	sigaction(SIGUSR2, &sigact, 0);
 }
 
 int	main(int argc, char **argv)
